@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "jsx": "preserve", // Enabling JSX for React (use "react" for older versions of React)
+    "lib": [
+      "dom",
+      "esnext"
+    ],
+    "allowJs": true, // Allow JavaScript files to be imported and compiled
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true, // Do not emit output files (Next.js handles the build)
+    "skipDefaultLibCheck": true,
+    "incremental": true
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
