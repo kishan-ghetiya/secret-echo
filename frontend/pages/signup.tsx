@@ -29,13 +29,13 @@ export default function Signup() {
 
     if (hasError) {
       setErrors(formErrors);
-      return; // Stop form submission if there are errors
+      return;
     }
 
     try {
       const res = await API.post('/auth/signup', form);
       localStorage.setItem('token', res.data.token);
-      router.push('/chat');
+      router.push('/');
     } catch (error) {
       console.error('Signup error:', error);
     }
