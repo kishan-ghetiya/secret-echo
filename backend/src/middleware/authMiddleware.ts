@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
+import { getJwtSecret } from '../utils/jwt';
 
 interface AuthRequest extends Request {
   user?: any;
@@ -13,10 +14,11 @@ export const verifyToken = (req: AuthRequest, res: Response, next: NextFunction)
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+    const decoded = jwt.verify(token, getJwtSecret());
     req.user = decoded;
     next();
   } catch (err) {
+    console.log('err', err)
     return res.status(400).json({ message: 'Invalid token.' });
   }
 };

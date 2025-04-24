@@ -1,24 +1,23 @@
-import Link from 'next/link';
-import { useAuth } from '../utils/AuthContext';
+import { useAuth } from "../utils/AuthContext";
+import { useRouter } from "next/router";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
+  const router = useRouter();
+  
+  const userEmail = user?.email || 'Guest';
 
   return (
-    <nav className="p-4 bg-black text-white flex justify-between items-center">
-      <Link href="/">SecretEcho</Link>
-      <div>
-        {user ? (
-          <>
-            <span className="mr-4">Hi, {user.email}</span>
-            <button onClick={logout} className="bg-red-600 px-4 py-1 rounded">
-              Logout
-            </button>
-          </>
+    <nav className="navbar-container">
+      <div className="navbar-content">
+        {!user ? (
+          <span className="title">Secret Echo</span>
         ) : (
           <>
-            <Link href="/signup" className="mr-4">Signup</Link>
-            <Link href="/">Login</Link>
+            <div className="user-info">
+              <span className="welcome-text">Welcome, {userEmail}!</span>
+              <button onClick={logout} className="logout-button">Logout</button>
+            </div>
           </>
         )}
       </div>

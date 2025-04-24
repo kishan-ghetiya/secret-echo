@@ -1,16 +1,36 @@
 import axios from 'axios';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002/api';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+
+const api = axios.create({
+  baseURL: API_BASE,
+});
+
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 export const login = async (email: string, password: string) => {
-  const res = await axios.post(`${API_BASE}/auth/login`, { email, password });
+  const res = await api.post('/auth/login', { email, password });
   const { token } = res.data;
   if (token) localStorage.setItem('token', token);
   return res.data;
 };
 
-export const signup = async (email: string, password: string) => {
-  return axios.post(`${API_BASE}/auth/signup`, { email, password });
+export const signup = async (username: string, email: string, password: string) => {
+  return api.post('/auth/signup', { username, email, password });
+};
+
+export const fetchMessages = async () => {
+  return api.get('/messages');
+};
+
+export const sendMessage = async (message: { sender: string; message: string }) => {
+  return api.post('/messages', message);
 };
 
 export const logout = () => {

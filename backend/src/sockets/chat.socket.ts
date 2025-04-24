@@ -1,6 +1,6 @@
-import { Server, Socket } from 'socket.io';
-import { Message } from '../models/message.model';
-import { Types } from 'mongoose';
+import { Server, Socket } from "socket.io";
+import { Message } from "../models/message.model";
+import { Types } from "mongoose";
 
 const predefinedReplies = [
   "That's interesting!",
@@ -8,47 +8,51 @@ const predefinedReplies = [
   "I'm here for you 😊",
   "That sounds fun!",
   "Wow, really?",
-  "Let's talk more!"
+  "Let's talk more!",
 ];
 
 export const registerSocketHandlers = (socket: Socket, io: Server) => {
   // Handle typing event from user
-  socket.on('typing', () => {
-    socket.broadcast.emit('typing', {
+  socket.on("typing", () => {
+    socket.broadcast.emit("typing", {
       userId: socket.id,
       isTyping: true,
     });
   });
 
   // Handle sending of user message
-  socket.on('sendMessage', async ({ senderId, content }) => {
+  socket.on("send_message", async ({ sender, message }) => {
     try {
-      // Save user message
-      const savedMessage = await Message.create({ sender: senderId, content });
-      io.emit('newMessage', savedMessage);
+      // Save user message      
+      const savedMessage = await Message.create({
+        sender: new Types.ObjectId(sender),
+        message: message,
+        isAI: false,
+      });
+      io.emit("receive_message", savedMessage);
 
       // Simulate AI is typing
-      io.emit('typing', { userId: 'AI', isTyping: true });
+      io.emit("typing", { userId: "AI Bot", isTyping: true });
 
       // Simulate delay then AI response
       setTimeout(async () => {
         // Stop typing indicator
-        io.emit('typing', { userId: 'AI', isTyping: false });
+        io.emit("typing", { userId: "AI Bot", isTyping: false });
 
         const aiReply = await Message.create({
-          sender: 'AI',
-          content: predefinedReplies[Math.floor(Math.random() * predefinedReplies.length)],
+          sender: new Types.ObjectId(sender),
+          message: predefinedReplies[Math.floor(Math.random() * predefinedReplies.length)],
         });
 
-        io.emit('newMessage', aiReply);
+        io.emit("receive_message", aiReply);
       }, 1500);
     } catch (error) {
-      console.error('Message error:', error);
+      console.error("Message error:", error);
     }
   });
 
   // Handle disconnect
-  socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
   });
 };

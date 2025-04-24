@@ -1,16 +1,28 @@
 import { Request, Response } from "express";
 import { Message } from "../models/message.model";
+import { User } from "../models/user.model";
+
+interface CustomRequest extends Request {
+  user?: {
+    id: string;
+    email?: string;
+    [key: string]: any;
+  };
+}
 
 export const getMessages = async (req: Request, res: Response) => {
   try {
+    const customReq = req as CustomRequest;
+    const userId = customReq.user?.id;
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 20;
     const skip = (page - 1) * limit;
 
-    const messages = await Message.find()
-      .sort({ createdAt: -1 }) // latest messages first
-      .skip(skip)
-      .limit(limit);
+    const messages = await Message.find({
+      $or: [{ sender: userId }, { receiver: userId }],
+    }).sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
 
     const totalMessages = await Message.countDocuments();
 
@@ -35,14 +47,26 @@ export const getMessages = async (req: Request, res: Response) => {
 
 export const postMessage = async (req: Request, res: Response) => {
   try {
-    const { sender, content } = req.body;
-    if (!sender || !content) {
+    const { sender, message } = req.body;
+
+    if (!sender || !message) {
       return res
         .status(400)
-        .json({ success: false, message: "Sender and content are required." });
+        .json({ success: false, message: "Sender and message are required." });
     }
 
-    const newMessage = await Message.create({ sender, content });
+    const user = await User.findOne({ _id: sender });
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "Sender not found in the system.",
+      });
+    }
+
+    const newMessage = await Message.create({
+      sender: user._id,
+      message,
+    });
 
     res.status(201).json({ success: true, data: newMessage });
   } catch (err) {
