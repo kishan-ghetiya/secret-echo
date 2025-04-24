@@ -21,11 +21,19 @@ git clone https://github.com/kishan-ghetiya/secret-echo
 cd secret-echo
 ```
 
-### 2. Running Backend and Frontend Separately (If needed)
+### 2 Setup Environment Variables
+
+Copy the example environment file and create your own `.env` file:
+
+```bash
+cp .env.example .env
+```
+
+### 3. Running Backend and Frontend Separately (If needed)
 
 If you want to run the backend and frontend separately, follow these steps:
 
-#### 2.1. Running the Backend
+#### 3.1. Running the Backend
 
 1. Navigate to the backend directory:
    ```bash
@@ -44,7 +52,7 @@ If you want to run the backend and frontend separately, follow these steps:
 
    This will start the backend service at `http://localhost:5000` (make sure you have a `.env` file with the necessary environment variables if needed).
 
-#### 2.2. Running the Frontend
+#### 3.2. Running the Frontend
 
 1. Navigate to the frontend directory:
    ```bash
@@ -63,7 +71,7 @@ If you want to run the backend and frontend separately, follow these steps:
 
    This will start the frontend service at `http://localhost:3000`.
 
-### 3. Accessing the Application
+### 4. Accessing the Application
 
 - The frontend will be available at `http://localhost:3000`
 - The backend will be available at `http://localhost:5000`
