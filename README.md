@@ -21,59 +21,49 @@ git clone https://github.com/kishan-ghetiya/secret-echo
 cd secret-echo
 ```
 
-### 2. Running with Docker Compose (Recommended)
-
-Use Docker Compose to build and run both the frontend and backend services together.
-
-1. In the root directory of the project (where the `docker-compose.yml` file is located), run the following command:
-
-   ```bash
-   docker-compose up --build
-   ```
-
-   This command will:
-   - Build the Docker images for the frontend and backend.
-   - Start the backend service on port `5000` and the frontend service on port `3000`.
-
-### 3. Running Backend and Frontend Separately (If needed)
+### 2. Running Backend and Frontend Separately (If needed)
 
 If you want to run the backend and frontend separately, follow these steps:
 
-#### 3.1. Running the Backend
+#### 2.1. Running the Backend
 
 1. Navigate to the backend directory:
    ```bash
    cd backend
    ```
 
-2. Build the Docker image for the backend:
+2. Install dependencies:
    ```bash
-   docker build -t backend .
+   npm install
    ```
 
-3. Run the backend container:
+3. Run the backend application in development mode:
    ```bash
-   docker run -p 5000:5000 backend
+   npm run dev
    ```
 
-#### 3.2. Running the Frontend
+   This will start the backend service at `http://localhost:5000` (make sure you have a `.env` file with the necessary environment variables if needed).
+
+#### 2.2. Running the Frontend
 
 1. Navigate to the frontend directory:
    ```bash
    cd frontend
    ```
 
-2. Build the Docker image for the frontend:
+2. Install dependencies:
    ```bash
-   docker build -t frontend .
+   npm install
    ```
 
-3. Run the frontend container:
+3. Run the frontend application in development mode:
    ```bash
-   docker run -p 3000:3000 frontend
+   npm run dev
    ```
 
-### 4. Accessing the Application
+   This will start the frontend service at `http://localhost:3000`.
+
+### 3. Accessing the Application
 
 - The frontend will be available at `http://localhost:3000`
 - The backend will be available at `http://localhost:5000`
