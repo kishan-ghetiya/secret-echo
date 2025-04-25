@@ -26,7 +26,16 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
+  const [loadingOlder, setLoadingOlder] = useState(false);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    totalPages: 1,
+    limit: 50,
+  });
+  const [hasMore, setHasMore] = useState(true);
+
   const bottomRef = useRef<HTMLDivElement>(null);
+  const chatBoxRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!user) {
@@ -37,17 +46,17 @@ export default function ChatPage() {
     socket.auth = { token: localStorage.getItem("token") };
     socket.connect();
 
-    // Load existing messages from API and normalize format
-    fetchMessages().then((res) => {
+    // Load initial messages
+    fetchMessages(pagination.page).then((res) => {
       const transformed = res.data.data.map((msg: APImessage) => ({
         sender: msg.sender || "ai",
         message: msg.message,
         createdAt: msg.createdAt,
       }));
       setMessages(transformed);
+      setPagination(res.data.pagination);
     });
 
-    // Handle receiving new messages via socket
     socket.on("receive_message", (msg: Message) => {
       if (msg.sender === "ai") {
         setTyping(true);
@@ -72,7 +81,6 @@ export default function ChatPage() {
         setTyping(data.isTyping);
       }
     });
-
     return () => {
       socket.off("typing");
     };
@@ -81,6 +89,52 @@ export default function ChatPage() {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  useEffect(() => {
+    const chatBox = chatBoxRef.current;
+    if (!chatBox) return;
+
+    const handleScroll = async () => {
+      if (chatBox.scrollTop === 0 && !loadingOlder && hasMore) {
+        const currentScrollHeight = chatBox.scrollHeight;
+        const currentScrollTop = chatBox.scrollTop;
+
+        setLoadingOlder(true);
+
+        // Fetch older messages
+        if (pagination.page < pagination.totalPages) {
+          const nextPage = pagination.page + 1;
+          const res = await fetchMessages(nextPage);
+
+          const newMessages = res.data.data.map((msg: APImessage) => ({
+            sender: msg.sender || "ai",
+            message: msg.message,
+            createdAt: msg.createdAt,
+          }));
+
+          // Add the new messages to the top
+          setMessages((prev) => [...newMessages, ...prev]);
+          setPagination(res.data.pagination);
+
+          if (nextPage === res.data.pagination.totalPages) {
+            setHasMore(false); // No more messages to fetch
+          }
+        }
+
+        setLoadingOlder(false);
+
+        // After fetching, restore the previous scroll position
+        // Ensure the scroll height stays at the top after the update
+        chatBox.scrollTop =
+          chatBox.scrollHeight - currentScrollHeight + currentScrollTop;
+      }
+    };
+
+    chatBox.addEventListener("scroll", handleScroll);
+    return () => {
+      chatBox.removeEventListener("scroll", handleScroll);
+    };
+  }, [loadingOlder, pagination, hasMore]);
 
   const handleSend = async () => {
     if (!input.trim()) return;
@@ -93,14 +147,18 @@ export default function ChatPage() {
 
     socket.emit("send_message", newMessage);
     await sendToAPI(newMessage);
-    // setMessages((prev) => [...prev, newMessage]);
     setInput("");
   };
 
   return (
     <div className="chat-container">
       {/* Chat Messages */}
-      <div className="chat-messages">
+      <div className="chat-messages" ref={chatBoxRef}>
+        {loadingOlder && (
+          <div className="loading-msg text-center text-gray-400 text-sm">
+            Loading older messages...
+          </div>
+        )}
         {messages.map((msg, i) => {
           const isUser = msg.sender === user?.id;
           const isAI = msg.sender === "ai";

@@ -15,12 +15,12 @@ export const getMessages = async (req: Request, res: Response) => {
     const customReq = req as CustomRequest;
     const userId = customReq.user?.id;
     const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 200;
+    const limit = parseInt(req.query.limit as string) || 50;
     const skip = (page - 1) * limit;
 
     const messages = await Message.find({
       $or: [{ sender: userId }, { receiver: userId }],
-    }).sort({ createdAt: 1 })
+    }).sort({ createdAt: -1 })
     .skip(skip)
     .limit(limit);
 
@@ -28,7 +28,7 @@ export const getMessages = async (req: Request, res: Response) => {
 
     res.status(200).json({
       success: true,
-      data: messages,
+      data: messages.reverse(),
       pagination: {
         total: totalMessages,
         page,

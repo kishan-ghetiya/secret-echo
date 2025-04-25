@@ -25,8 +25,9 @@ export const signup = async (username: string, email: string, password: string) 
   return api.post('/auth/signup', { username, email, password });
 };
 
-export const fetchMessages = async () => {
-  return api.get('/messages');
+export const fetchMessages = async (page: number) => {
+  const params = { page };
+  return api.get("/messages", { params });
 };
 
 export const sendMessage = async (message: { sender: string; message: string }) => {

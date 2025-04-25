@@ -3,6 +3,9 @@
 
 This repository contains the code for a SecretEcho application consisting of a backend (Node.js) and a frontend (React/Next.js). Below are the steps to run and deploy the application using Docker.
 
+## Demo
+Check out the live demo here: [SecretEcho Demo](https://secret-echo-kg6n.vercel.app/)
+
 ## Prerequisites
 
 Ensure you have the following installed:
