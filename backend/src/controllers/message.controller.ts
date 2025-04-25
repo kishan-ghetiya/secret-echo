@@ -15,12 +15,12 @@ export const getMessages = async (req: Request, res: Response) => {
     const customReq = req as CustomRequest;
     const userId = customReq.user?.id;
     const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 20;
+    const limit = parseInt(req.query.limit as string) || 200;
     const skip = (page - 1) * limit;
 
     const messages = await Message.find({
       $or: [{ sender: userId }, { receiver: userId }],
-    }).sort({ createdAt: -1 })
+    }).sort({ createdAt: 1 })
     .skip(skip)
     .limit(limit);
 
@@ -63,12 +63,12 @@ export const postMessage = async (req: Request, res: Response) => {
       });
     }
 
-    const newMessage = await Message.create({
-      sender: user._id,
-      message,
-    });
+    // const newMessage = await Message.create({
+    //   sender: user._id,
+    //   message,
+    // });
 
-    res.status(201).json({ success: true, data: newMessage });
+    res.status(201).json({ success: true });
   } catch (err) {
     res.status(500).json({
       success: false,
