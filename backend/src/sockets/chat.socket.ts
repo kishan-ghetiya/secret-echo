@@ -23,14 +23,6 @@ export const registerSocketHandlers = (socket: Socket, io: Server) => {
   // Handle sending of user message
   socket.on("send_message", async ({ sender, message }) => {
     try {
-      // Save user message      
-      const savedMessage = await Message.create({
-        sender: new Types.ObjectId(sender),
-        message: message,
-        isAI: false,
-      });
-      io.emit("receive_message", savedMessage);
-
       // Simulate AI is typing
       io.emit("typing", { userId: "AI Bot", isTyping: true });
 
