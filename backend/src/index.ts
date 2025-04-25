@@ -34,6 +34,10 @@ app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 app.use(errorHandler);
 
+app.get('/', (req, res) => {
+  res.send('Secret Echo API is running 🚀');
+});
+
 // Socket Setup
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
